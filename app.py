@@ -4,7 +4,6 @@ import pdfplumber
 
 app = Flask(__name__, template_folder='templates', static_folder='static')
 
-
 @app.route('/',methods=['GET'])
 def indexPage():
     return render_template('index.html')
@@ -23,7 +22,7 @@ def generate_summary(text, max_length, min_length, num_beams,model_type):
     tokenizer = BartTokenizer.from_pretrained(f'./Models/{model_type}')
     model = BartForConditionalGeneration.from_pretrained(f'./Models/{model_type}')
     
-    inputs = tokenizer.encode(text, return_tensors='pt', max_length=520, truncation=True)
+    inputs = tokenizer.encode(text, return_tensors='pt', max_length=1024, truncation=True)
     summary_ids = model.generate(
         inputs,
         max_length=max_length,
@@ -55,13 +54,14 @@ def summarize():
     author = request.form['authorName']
     paperTitle = request.form['paperTitle']
     query_pdf = request.files['researchPaper']
+    
     text = pdf_loader(query_pdf)
     
     if not text:
         return jsonify({'error': 'No text provided'}), 400
     
-    # Generate the summary
     summary = generate_summary(text,max_limit, min_limit, qualityIndex,model_type)
+    
     return render_template('fetch.html',
                            summary=summary,
                            author=author,
@@ -73,4 +73,4 @@ def summarize():
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True,port=3000)

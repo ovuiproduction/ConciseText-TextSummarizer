@@ -574,3 +574,7 @@ h6,
   .loader_active{
     display: block;
   }
+
+  .summary-text{
+    text-align: justify;
+  }
