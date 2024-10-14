@@ -576,5 +576,23 @@ h6,
   }
 
   .summary-text{
+    margin-top:1rem;
     text-align: justify;
+  }
+
+  .px-lg-5{
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+  }
+.researchpaperdiv{
+    width:40%;
+    height:90%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+  .researchpaperlogo{
+    width:50%;
+    height:90%;
   }

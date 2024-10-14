@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, jsonify
 from transformers import BartTokenizer, BartForConditionalGeneration
 import pdfplumber
+import re
 
 app = Flask(__name__, template_folder='templates', static_folder='static')
 
@@ -17,6 +18,19 @@ def uploadPage():
     return render_template('upload.html')
 
 
+def clean_summary(summary):
+    summary = re.sub(r'\s+', ' ', summary).strip()
+    summary = re.sub(r'[^a-zA-Z0-9.,!?\'"-]', ' ', summary)
+    summary = re.sub(r'\s([?.!,"\'-](?:\s|$))', r'\1', summary)
+
+    if summary and summary[0].islower():
+        summary = summary[0].upper() + summary[1:]
+    
+    if summary and summary[-1] not in {'.', '!', '?'}:
+        summary += '.'
+        
+    return summary
+
 def generate_summary(text, max_length, min_length, num_beams,model_type):
     
     tokenizer = BartTokenizer.from_pretrained(f'./Models/{model_type}')
@@ -25,9 +39,9 @@ def generate_summary(text, max_length, min_length, num_beams,model_type):
     inputs = tokenizer.encode(text, return_tensors='pt', max_length=1024, truncation=True)
     summary_ids = model.generate(
         inputs,
-        max_length=max_length,
-        min_length=min_length,
-        num_beams=num_beams,
+        max_length=150,
+        min_length=30,
+        num_beams=2,
         length_penalty=2.0,
         early_stopping=True
     )
@@ -59,11 +73,12 @@ def summarize():
     
     if not text:
         return jsonify({'error': 'No text provided'}), 400
-    
-    summary = generate_summary(text,max_limit, min_limit, qualityIndex,model_type)
-    
+    print("Request Arrived")
+    raw_summary = generate_summary(text,max_limit, min_limit, qualityIndex,model_type)
+    cleaned_summary = clean_summary(raw_summary)
+    print("Request Sent")
     return render_template('fetch.html',
-                           summary=summary,
+                           summary=cleaned_summary,
                            author=author,
                            paperTitle=paperTitle,
                            model_type=model_type,
