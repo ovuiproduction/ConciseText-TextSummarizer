@@ -596,3 +596,14 @@ h6,
     width:50%;
     height:90%;
   }
+
+  .warning-msg{
+    margin-top:0px;
+    font-size:15px;
+    color:rgb(235, 7, 7);
+    margin:auto;
+    text-align: center;
+    padding:0.5rem;
+    background-color: rgb(235, 233, 233);
+    margin-bottom:2rem;
+  }

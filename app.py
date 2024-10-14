@@ -39,9 +39,9 @@ def generate_summary(text, max_length, min_length, num_beams,model_type):
     inputs = tokenizer.encode(text, return_tensors='pt', max_length=1024, truncation=True)
     summary_ids = model.generate(
         inputs,
-        max_length=150,
-        min_length=30,
-        num_beams=2,
+        max_length=max_length,
+        min_length=min_length,
+        num_beams=num_beams,
         length_penalty=2.0,
         early_stopping=True
     )
@@ -76,6 +76,14 @@ def summarize():
     print("Request Arrived")
     raw_summary = generate_summary(text,max_limit, min_limit, qualityIndex,model_type)
     cleaned_summary = clean_summary(raw_summary)
+    
+    if(model_type == "facebook_bart_large_cnn"):
+        model_type = "Bart Large Version"
+    elif(model_type == "facebook_bart_small_cnn"):
+        model_type = "Bart Small Version"
+    elif(model_type == "fine_tuned_100"):
+        model_type = "Bart Fine tuned Version"
+        
     print("Request Sent")
     return render_template('fetch.html',
                            summary=cleaned_summary,
